@@ -179,6 +179,13 @@ public class Slf4JLogger implements Logger {
      * @return 例外クラスのオブジェクトを追加したオプション配列
      */
     private Object[] getOptionsWithThrowable(final Throwable throwable, final Object[] options) {
+        if (options == null) {
+            if (throwable == null) {
+                return new Object[0];
+            } else {
+                return new Object[] {throwable};
+            }
+        }
         final Object[] array = Arrays.copyOf(options, options.length + 1);
         array[array.length - 1] = throwable;
         return array;
