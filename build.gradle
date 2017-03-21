@@ -33,6 +33,8 @@ dependencies {
   compile 'org.slf4j:slf4j-api:1.7.22'
 
 
+  testCompile "com.nablarch.framework:nablarch-core-applog:${nablarchCoreApplogVersion}"
+  
   testCompile 'org.jmockit:jmockit:1.30'
   testCompile 'junit:junit:4.12'
   testCompile 'org.slf4j:slf4j-simple:1.7.22'
