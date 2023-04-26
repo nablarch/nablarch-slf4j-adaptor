@@ -1,28 +1,44 @@
 package nablarch.integration.log.slf4j;
 
-import mockit.Expectations;
-import mockit.Mocked;
-import mockit.Verifications;
 import nablarch.core.log.Logger;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.MockedStatic;
+import org.slf4j.LoggerFactory;
 import org.slf4j.impl.SimpleLogger;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * {@link Slf4JLogger}のテストクラス
  */
 public class Slf4JLoggerTest {
+    private final SimpleLogger mockLogger = mock(SimpleLogger.class);
+    private MockedStatic<LoggerFactory> loggerFactoryMockStatic;
+
+    @Before
+    public void setUp() {
+        loggerFactoryMockStatic = mockStatic(LoggerFactory.class);
+        loggerFactoryMockStatic.when(() -> LoggerFactory.getLogger(anyString())).thenReturn(mockLogger);
+    }
+
+    @After
+    public void tearDown() {
+        loggerFactoryMockStatic.close();
+    }
 
     @Test
-    public void isFatalEnabled(@Mocked final SimpleLogger mockLogger) throws Exception {
-
-        new Expectations() {{
-            mockLogger.isErrorEnabled();
-            returns(false, true, true, false);
-        }};
-
+    public void isFatalEnabled() throws Exception {
+        when(mockLogger.isErrorEnabled()).thenReturn(false, true, true, false);
+        
         final Logger sut = new Slf4JLoggerFactory().get("test");
         assertThat(sut.isFatalEnabled(), is(false));
         assertThat(sut.isFatalEnabled(), is(true));
@@ -31,32 +47,25 @@ public class Slf4JLoggerTest {
     }
 
     @Test
-    public void logFatal_messageAndOptions(@Mocked final SimpleLogger mockLogger) throws Exception {
+    public void logFatal_messageAndOptions() throws Exception {
         final Logger sut = new Slf4JLoggerFactory().get("test");
         sut.logFatal("fatal-{}:{}", "a", "b");
 
-        new Verifications() {{
-            mockLogger.error("fatal-{}:{}", new Object[] {"a", "b"});
-        }};
+        verify(mockLogger, atLeastOnce()).error("fatal-{}:{}", new Object[] {"a", "b"});
     }
 
     @Test
-    public void logFatal_messageAndThrowableAndOptions(@Mocked final SimpleLogger mockLogger) throws Exception {
+    public void logFatal_messageAndThrowableAndOptions() throws Exception {
         final IllegalArgumentException exception = new IllegalArgumentException("test");
         final Logger sut = new Slf4JLoggerFactory().get("test");
         sut.logFatal("fatal exception", exception, "a");
 
-        new Verifications() {{
-            mockLogger.error("fatal exception", new Object[] {"a", exception});
-        }};
+        verify(mockLogger, atLeastOnce()).error("fatal exception", new Object[] {"a", exception});
     }
 
     @Test
-    public void isErrorEnabled(@Mocked final SimpleLogger mockLogger) throws Exception {
-        new Expectations() {{
-            mockLogger.isErrorEnabled();
-            returns(false, true, true, false);
-        }};
+    public void isErrorEnabled() throws Exception {
+        when(mockLogger.isErrorEnabled()).thenReturn(false, true, true, false);
 
         final Logger sut = new Slf4JLoggerFactory().get("test");
         assertThat(sut.isErrorEnabled(), is(false));
@@ -66,32 +75,25 @@ public class Slf4JLoggerTest {
     }
 
     @Test
-    public void logError_messageAndOptions(@Mocked final SimpleLogger mockLogger) throws Exception {
+    public void logError_messageAndOptions() throws Exception {
         final Logger sut = new Slf4JLoggerFactory().get("test");
         sut.logError("error-{}:{}", "a", "b");
 
-        new Verifications() {{
-            mockLogger.error("error-{}:{}", new Object[] {"a", "b"});
-        }};
+        verify(mockLogger, atLeastOnce()).error("error-{}:{}", new Object[] {"a", "b"});
     }
 
     @Test
-    public void logError_messageAndThrowableAndOptions(@Mocked final SimpleLogger mockLogger) throws Exception {
+    public void logError_messageAndThrowableAndOptions() throws Exception {
         final IllegalArgumentException exception = new IllegalArgumentException("test");
         final Logger sut = new Slf4JLoggerFactory().get("test");
         sut.logError("error exception", exception, "a");
 
-        new Verifications() {{
-            mockLogger.error("error exception", new Object[] {"a", exception});
-        }};
+        verify(mockLogger, atLeastOnce()).error("error exception", new Object[] {"a", exception});
     }
 
     @Test
-    public void isWarnEnabled(@Mocked final SimpleLogger mockLogger) throws Exception {
-        new Expectations() {{
-            mockLogger.isWarnEnabled();
-            returns(false, true, true, false);
-        }};
+    public void isWarnEnabled() throws Exception {
+        when(mockLogger.isWarnEnabled()).thenReturn(false, true, true, false);
 
         final Logger sut = new Slf4JLoggerFactory().get("test");
         assertThat(sut.isWarnEnabled(), is(false));
@@ -101,32 +103,25 @@ public class Slf4JLoggerTest {
     }
 
     @Test
-    public void logWarn_messageAndOptions(@Mocked final SimpleLogger mockLogger) throws Exception {
+    public void logWarn_messageAndOptions() throws Exception {
         final Logger sut = new Slf4JLoggerFactory().get("test");
         sut.logWarn("warn-{}:{}", "a", "b");
 
-        new Verifications() {{
-            mockLogger.warn("warn-{}:{}", new Object[] {"a", "b"});
-        }};
+        verify(mockLogger, atLeastOnce()).warn("warn-{}:{}", new Object[] {"a", "b"});
     }
 
     @Test
-    public void logWarn_messageAndThrowableAndOptions(@Mocked final SimpleLogger mockLogger) throws Exception {
+    public void logWarn_messageAndThrowableAndOptions() throws Exception {
         final IllegalArgumentException exception = new IllegalArgumentException("test");
         final Logger sut = new Slf4JLoggerFactory().get("test");
         sut.logWarn("warn exception", exception, "a");
 
-        new Verifications() {{
-            mockLogger.warn("warn exception", new Object[] {"a", exception});
-        }};
+        verify(mockLogger, atLeastOnce()).warn("warn exception", new Object[] {"a", exception});
     }
 
     @Test
-    public void isInfoEnabled(@Mocked final SimpleLogger mockLogger) throws Exception {
-        new Expectations() {{
-            mockLogger.isInfoEnabled();
-            returns(false, true, true, false);
-        }};
+    public void isInfoEnabled() throws Exception {
+        when(mockLogger.isInfoEnabled()).thenReturn(false, true, true, false);
 
         final Logger sut = new Slf4JLoggerFactory().get("test");
         assertThat(sut.isInfoEnabled(), is(false));
@@ -136,32 +131,25 @@ public class Slf4JLoggerTest {
     }
 
     @Test
-    public void logInfo_messageAndOptions(@Mocked final SimpleLogger mockLogger) throws Exception {
+    public void logInfo_messageAndOptions() throws Exception {
         final Logger sut = new Slf4JLoggerFactory().get("test");
         sut.logInfo("info-{}:{}", "a", "b");
 
-        new Verifications() {{
-            mockLogger.info("info-{}:{}", new Object[] {"a", "b"});
-        }};
+        verify(mockLogger, atLeastOnce()).info("info-{}:{}", new Object[] {"a", "b"});
     }
 
     @Test
-    public void logInfo_messageAndThrowableAndOptions(@Mocked final SimpleLogger mockLogger) throws Exception {
+    public void logInfo_messageAndThrowableAndOptions() throws Exception {
         final IllegalArgumentException exception = new IllegalArgumentException("test");
         final Logger sut = new Slf4JLoggerFactory().get("test");
         sut.logInfo("info exception", exception, "a");
 
-        new Verifications() {{
-            mockLogger.info("info exception", new Object[] {"a", exception});
-        }};
+        verify(mockLogger, atLeastOnce()).info("info exception", new Object[] {"a", exception});
     }
 
     @Test
-    public void isDebugEnabled(@Mocked final SimpleLogger mockLogger) throws Exception {
-        new Expectations() {{
-            mockLogger.isDebugEnabled();
-            returns(false, true, true, false);
-        }};
+    public void isDebugEnabled() throws Exception {
+        when(mockLogger.isDebugEnabled()).thenReturn(false, true, true, false);
 
         final Logger sut = new Slf4JLoggerFactory().get("test");
         assertThat(sut.isDebugEnabled(), is(false));
@@ -171,32 +159,25 @@ public class Slf4JLoggerTest {
     }
 
     @Test
-    public void logDebug_messageAndOptions(@Mocked final SimpleLogger mockLogger) throws Exception {
+    public void logDebug_messageAndOptions() throws Exception {
         final Logger sut = new Slf4JLoggerFactory().get("test");
         sut.logDebug("debug-{}:{}", "a", "b");
 
-        new Verifications() {{
-            mockLogger.debug("debug-{}:{}", new Object[] {"a", "b"});
-        }};
+        verify(mockLogger, atLeastOnce()).debug("debug-{}:{}", new Object[] {"a", "b"});
     }
 
     @Test
-    public void logDebug_messageAndThrowableAndOptions(@Mocked final SimpleLogger mockLogger) throws Exception {
+    public void logDebug_messageAndThrowableAndOptions() throws Exception {
         final IllegalArgumentException exception = new IllegalArgumentException("test");
         final Logger sut = new Slf4JLoggerFactory().get("test");
         sut.logDebug("debug exception", exception, "a");
 
-        new Verifications() {{
-            mockLogger.debug("debug exception", new Object[] {"a", exception});
-        }};
+        verify(mockLogger, atLeastOnce()).debug("debug exception", new Object[] {"a", exception});
     }
 
     @Test
-    public void isTraceEnabled(@Mocked final SimpleLogger mockLogger) throws Exception {
-        new Expectations() {{
-            mockLogger.isTraceEnabled();
-            returns(false, true, true, false);
-        }};
+    public void isTraceEnabled() throws Exception {
+        when(mockLogger.isTraceEnabled()).thenReturn(false, true, true, false);
 
         final Logger sut = new Slf4JLoggerFactory().get("test");
         assertThat(sut.isTraceEnabled(), is(false));
@@ -206,24 +187,20 @@ public class Slf4JLoggerTest {
     }
 
     @Test
-    public void logTrace_messageAndOptions(@Mocked final SimpleLogger mockLogger) throws Exception {
+    public void logTrace_messageAndOptions() throws Exception {
         final Logger sut = new Slf4JLoggerFactory().get("test");
         sut.logTrace("trace-{}:{}", "a", "b");
 
-        new Verifications() {{
-            mockLogger.trace("trace-{}:{}", new Object[] {"a", "b"});
-        }};
+        verify(mockLogger, atLeastOnce()).trace("trace-{}:{}", new Object[] {"a", "b"});
     }
 
     @Test
-    public void logTrace_messageAndThrowableAndOptions(@Mocked final SimpleLogger mockLogger) throws Exception {
+    public void logTrace_messageAndThrowableAndOptions() throws Exception {
         final IllegalArgumentException exception = new IllegalArgumentException("test");
         final Logger sut = new Slf4JLoggerFactory().get("test");
         sut.logTrace("trace exception", exception, "a");
 
-        new Verifications() {{
-            mockLogger.trace("trace exception", new Object[] {"a", exception});
-        }};
+        verify(mockLogger, atLeastOnce()).trace("trace exception", new Object[] {"a", exception});
     }
 
     public static void main(String[] args) {
